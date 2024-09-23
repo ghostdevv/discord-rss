@@ -1,12 +1,16 @@
 {
-    "tasks": {
-        "dev": "deno run --watch src/main.ts"
-    },
-    "fmt": {
-        "singleQuote": true,
-        "semiColons": true,
-        "useTabs": true,
-        "indentWidth": 4,
-        "lineWidth": 100
-    }
+	"tasks": {
+		"dev": "deno run --allow-net --unstable-kv --watch src/main.ts"
+	},
+	"fmt": {
+		"singleQuote": true,
+		"semiColons": true,
+		"useTabs": true,
+		"indentWidth": 4,
+		"lineWidth": 100
+	},
+	"imports": {
+		"@std/async": "jsr:@std/async@^1.0.5",
+		"xml2js": "npm:xml2js@^0.6.2"
+	}
 }
