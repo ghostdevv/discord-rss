@@ -1,8 +1,11 @@
-import config from '../config.json' with { type: 'json' };
 import { parseFeed } from '@mikaelporttila/rss';
 import { ensureDir } from '@std/fs';
 import { retry } from '@std/async';
 import { join } from '@std/path';
+
+const { default: config } = await import('../config.json', {
+    with: { type: 'json' },
+});
 
 if (config.feeds.length == 0) {
     throw new Error('No feeds given in config');
