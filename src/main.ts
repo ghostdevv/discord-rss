@@ -3,9 +3,19 @@ import { ensureDir } from '@std/fs';
 import { retry } from '@std/async';
 import { join } from '@std/path';
 
-const { default: config } = await import('../config.json', {
-    with: { type: 'json' },
-});
+interface Config {
+    feeds: string[];
+    webhooks: string[];
+    healthCheck?: {
+        endpoint: string;
+        interval: number;
+        method: string;
+    };
+}
+
+const config = await import('../config.json', { with: { type: 'json' } }).then((mod) =>
+    mod.default as Config
+);
 
 if (config.feeds.length == 0) {
     throw new Error('No feeds given in config');
@@ -110,4 +120,18 @@ for (const url of config.feeds) {
     } catch (error) {
         console.log(`Failed to init feed "${url}"`, error);
     }
+}
+
+if (config.healthCheck) {
+    const { endpoint, interval, method } = config.healthCheck;
+    console.log(`Setup health check, calling every ${interval} seconds`);
+
+    // deno-lint-ignore no-inner-declarations
+    async function check() {
+        console.log('Posting health check request');
+        await fetch(endpoint, { method });
+    }
+
+    await check();
+    setInterval(check, interval * 1000);
 }
