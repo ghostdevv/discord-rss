@@ -1,8 +1,14 @@
-FROM denoland/deno:alpine
+FROM        denoland/deno:alpine
 
-WORKDIR /app
+LABEL       author="Willow (GHOST)"
+LABEL       maintainer="ghostdevbusiness@gmail.com"
+LABEL       org.opencontainers.image.source="https://github.com/ghostdevv/docker-images"
 
-COPY . .
-RUN deno cache src/main.ts
 
-CMD ["deno", "task", "start"]
+WORKDIR     /app
+
+COPY        . .
+
+RUN         deno cache src/main.ts
+
+CMD         ["deno", "task", "start"]
