@@ -73,7 +73,7 @@ async function check_feed(url: string) {
                     url: feed.links[0],
                 },
                 timestamp: typeof feed.published != 'undefined'
-                    ? new Date(feed.published).getTime()
+                    ? new Date(feed.published).toISOString()
                     : undefined,
             }],
         };
