@@ -13,6 +13,8 @@ interface Config {
     };
 }
 
+const DEV = Deno.args.includes('--dev');
+
 const config = await import('../config.json', { with: { type: 'json' } }).then((mod) =>
     mod.default as Config
 );
@@ -58,36 +60,42 @@ async function check_feed(url: string) {
 
         console.log(`New entry (${entry.id}): ${entry.links[0]?.href}`);
 
-        for (const webhook of config.webhooks) {
-            // todo send 10 at once
-            const res = await fetch(webhook, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+        const webhook_body = {
+            embeds: [{
+                title: entry.title?.value || '¯\\_(ツ)_/¯',
+                description: `${entry.description?.value || ''}\n\n${
+                    entry.links.map((link, index) =>
+                        `[${link.title || `Link ${index + 1}`}](${link.href})`
+                    )
+                }`,
+                author: {
+                    name: feed.title.value ?? 'Someones RSS Feed',
+                    url: feed.links[0],
                 },
-                body: JSON.stringify({
-                    embeds: [{
-                        title: entry.title?.value || '¯\\_(ツ)_/¯',
-                        description: `${entry.description?.value || ''}\n\n${
-                            entry.links.map((link, index) =>
-                                `[${link.title || `Link ${index + 1}`}](${link.href})`
-                            )
-                        }`,
-                        author: {
-                            name: feed.title.value ?? 'Someones RSS Feed',
-                            url: feed.links[0],
-                        },
-                        timestamp: typeof feed.published != 'undefined'
-                            ? new Date(feed.published).getTime()
-                            : undefined,
-                    }],
-                }),
-            });
+                timestamp: typeof feed.published != 'undefined'
+                    ? new Date(feed.published).getTime()
+                    : undefined,
+            }],
+        };
 
-            if (res.ok) {
-                await kv.set(kv_key, true);
-            } else {
-                console.warn('Error processing feed item', await res.json());
+        if (DEV) {
+            console.log('Skipping sending webhooks in dev, here is the body', webhook_body);
+        } else {
+            for (const webhook of config.webhooks) {
+                // todo send 10 at once
+                const res = await fetch(webhook, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(webhook_body),
+                });
+
+                if (res.ok) {
+                    await kv.set(kv_key, true);
+                } else {
+                    console.warn('Error processing feed item', await res.json());
+                }
             }
         }
     }
