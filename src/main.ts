@@ -137,7 +137,11 @@ if (config.healthCheck) {
     // deno-lint-ignore no-inner-declarations
     async function check() {
         try {
-            await fetch(endpoint, { method });
+            await retry(() => fetch(endpoint, { method }), {
+                maxTimeout: 2500,
+                minTimeout: 1000,
+                maxAttempts: 2,
+            });
         } catch (error) {
             console.error(`Failed to ${method} the health check endpoint`, error);
         }
