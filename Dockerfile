@@ -1,4 +1,4 @@
-FROM        denoland/deno:alpine
+FROM        denoland/deno:alpine-2.0.0
 
 LABEL       author="Willow (GHOST)"
 LABEL       maintainer="ghostdevbusiness@gmail.com"
