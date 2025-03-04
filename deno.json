@@ -12,10 +12,10 @@
 		"lineWidth": 100
 	},
 	"imports": {
-		"@mikaelporttila/rss": "jsr:@mikaelporttila/rss@^1.1.1",
-		"@std/async": "jsr:@std/async@^1.0.5",
-		"@std/fs": "jsr:@std/fs@^1.0.3",
-		"@std/path": "jsr:@std/path@^1.0.6",
+		"@mikaelporttila/rss": "jsr:@mikaelporttila/rss@^1.1.2",
+		"@std/async": "jsr:@std/async@^1.0.11",
+		"@std/fs": "jsr:@std/fs@^1.0.14",
+		"@std/path": "jsr:@std/path@^1.0.8",
 		"xml2js": "npm:xml2js@^0.6.2"
 	}
 }

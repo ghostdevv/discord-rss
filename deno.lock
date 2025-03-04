@@ -1,54 +1,49 @@
 {
-  "version": "3",
-  "packages": {
-    "specifiers": {
-      "jsr:@maxim-mazurok/sax-ts@1.2.13": "jsr:@maxim-mazurok/sax-ts@1.2.13",
-      "jsr:@mikaelporttila/rss@^1.1.1": "jsr:@mikaelporttila/rss@1.1.1",
-      "jsr:@std/async@^1.0.5": "jsr:@std/async@1.0.5",
-      "jsr:@std/fs@^1.0.3": "jsr:@std/fs@1.0.3",
-      "jsr:@std/path@^1.0.4": "jsr:@std/path@1.0.6",
-      "jsr:@std/path@^1.0.6": "jsr:@std/path@1.0.6",
-      "npm:xml2js@^0.6.2": "npm:xml2js@0.6.2"
+  "version": "4",
+  "specifiers": {
+    "jsr:@maxim-mazurok/sax-ts@1.2.13": "1.2.13",
+    "jsr:@mikaelporttila/rss@^1.1.2": "1.1.2",
+    "jsr:@std/async@^1.0.11": "1.0.11",
+    "jsr:@std/fs@^1.0.14": "1.0.14",
+    "jsr:@std/path@^1.0.8": "1.0.8",
+    "npm:xml2js@~0.6.2": "0.6.2"
+  },
+  "jsr": {
+    "@maxim-mazurok/sax-ts@1.2.13": {
+      "integrity": "9f2f9a3ac1b142400940a4c9e916656fe63d4710a78102aeb8e08e863de2c76d"
     },
-    "jsr": {
-      "@maxim-mazurok/sax-ts@1.2.13": {
-        "integrity": "9f2f9a3ac1b142400940a4c9e916656fe63d4710a78102aeb8e08e863de2c76d"
-      },
-      "@mikaelporttila/rss@1.1.1": {
-        "integrity": "f07d7a5a269398f00efd6913d14a92defa55bcb66a4de196a5a5c99ec9df4b8b",
-        "dependencies": [
-          "jsr:@maxim-mazurok/sax-ts@1.2.13"
-        ]
-      },
-      "@std/async@1.0.5": {
-        "integrity": "31d68214bfbb31bd4c6022401d484e3964147c76c9220098baa703a39b6c2da6"
-      },
-      "@std/fs@1.0.3": {
-        "integrity": "3cb839b1360b0a42d8b367c3093bfe4071798e6694fa44cf1963e04a8edba4fe",
-        "dependencies": [
-          "jsr:@std/path@^1.0.4"
-        ]
-      },
-      "@std/path@1.0.6": {
-        "integrity": "ab2c55f902b380cf28e0eec501b4906e4c1960d13f00e11cfbcd21de15f18fed"
-      }
+    "@mikaelporttila/rss@1.1.2": {
+      "integrity": "064a7b1be7b25ddefca1491712c6921fa003bd279683325630e6acedf31bb98a",
+      "dependencies": [
+        "jsr:@maxim-mazurok/sax-ts"
+      ]
     },
-    "npm": {
-      "sax@1.4.1": {
-        "integrity": "sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==",
-        "dependencies": {}
-      },
-      "xml2js@0.6.2": {
-        "integrity": "sha512-T4rieHaC1EXcES0Kxxj4JWgaUQHDk+qwHcYOCFHfiwKz7tOVPLq7Hjq9dM1WCMhylqMEfP7hMcOIChvotiZegA==",
-        "dependencies": {
-          "sax": "sax@1.4.1",
-          "xmlbuilder": "xmlbuilder@11.0.1"
-        }
-      },
-      "xmlbuilder@11.0.1": {
-        "integrity": "sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==",
-        "dependencies": {}
-      }
+    "@std/async@1.0.11": {
+      "integrity": "eee0d3405275506638a9c8efaa849cf0d35873120c69b7caa1309c9a9e5b6f85"
+    },
+    "@std/fs@1.0.14": {
+      "integrity": "1e84bf0b95fe08f41f1f4aea9717bbf29f45408a56ce073b0114474ce1c9fccf",
+      "dependencies": [
+        "jsr:@std/path"
+      ]
+    },
+    "@std/path@1.0.8": {
+      "integrity": "548fa456bb6a04d3c1a1e7477986b6cffbce95102d0bb447c67c4ee70e0364be"
+    }
+  },
+  "npm": {
+    "sax@1.4.1": {
+      "integrity": "sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg=="
+    },
+    "xml2js@0.6.2": {
+      "integrity": "sha512-T4rieHaC1EXcES0Kxxj4JWgaUQHDk+qwHcYOCFHfiwKz7tOVPLq7Hjq9dM1WCMhylqMEfP7hMcOIChvotiZegA==",
+      "dependencies": [
+        "sax",
+        "xmlbuilder"
+      ]
+    },
+    "xmlbuilder@11.0.1": {
+      "integrity": "sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA=="
     }
   },
   "redirects": {
@@ -94,11 +89,11 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@mikaelporttila/rss@^1.1.1",
-      "jsr:@std/async@^1.0.5",
-      "jsr:@std/fs@^1.0.3",
-      "jsr:@std/path@^1.0.6",
-      "npm:xml2js@^0.6.2"
+      "jsr:@mikaelporttila/rss@^1.1.2",
+      "jsr:@std/async@^1.0.11",
+      "jsr:@std/fs@^1.0.14",
+      "jsr:@std/path@^1.0.8",
+      "npm:xml2js@~0.6.2"
     ]
   }
 }
