@@ -64,9 +64,11 @@ async function check_feed(url: string) {
 			embeds: [{
 				title: entry.title?.value || '¯\\_(ツ)_/¯',
 				description: `${entry.description?.value || ''}\n\n${
-					entry.links.map((link, index) =>
-						`[${link.title || `Link ${index + 1}`}](${link.href})`
-					)
+					entry.links
+						.filter((link) => URL.parse(link.href)?.protocol.includes('http'))
+						.map((link, index) =>
+							`[${link.title || `Link ${index + 1}`}](${link.href})`
+						)
 				}`,
 				author: {
 					name: feed.title.value ?? 'Someones RSS Feed',
