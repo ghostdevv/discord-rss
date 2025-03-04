@@ -55,7 +55,7 @@ async function check_feed(url: string) {
 	const feed = await fetch_feed(url);
 
 	for (const entry of feed.entries) {
-		const kv_key = [url, entry.id];
+		const kv_key = [url, `${entry.id}`];
 		if ((await kv.get(kv_key)).value) continue;
 
 		console.log(`New entry (${entry.id}): ${entry.links[0]?.href}`);
@@ -65,7 +65,9 @@ async function check_feed(url: string) {
 				title: entry.title?.value || '¯\\_(ツ)_/¯',
 				description: `${entry.description?.value || ''}\n\n${
 					entry.links
-						.filter((link) => URL.parse(link.href)?.protocol.includes('http'))
+						.filter((link) =>
+							link.href && URL.parse(link.href)?.protocol.includes('http')
+						)
 						.map((link, index) =>
 							`[${link.title || `Link ${index + 1}`}](${link.href})`
 						)
@@ -117,7 +119,7 @@ for (const url of config.feeds) {
 			console.log(`  ^ Feed has not been used before, updating store...`);
 
 			for (const entry of feed.entries) {
-				await kv.set([url, entry.id], true);
+				await kv.set([url, `${entry.id}`], true);
 			}
 
 			await kv.set([url, 'config'], { init_ts: Date.now() });
