@@ -86,7 +86,7 @@ async function check_feed(config_feed: Feed) {
 		console.log(`New entry (${entry.id}): ${entry.links[0]?.href}`);
 
 		let image: null | string = null;
-		if (config_feed.imageMode == ImageMode.tag) {
+		if (config_feed.imageMode == ImageMode.tag && entry.description?.value) {
 			const get_img_link = /[(?:&lt;)<]\s*img.*?src\s*=\s*(["'])(.*?)\1.*?\/[(?:&gt;)>]/s;
 			const image_tag = get_img_link.exec(entry.description.value);
 			if (image_tag) {
