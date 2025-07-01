@@ -1,6 +1,8 @@
 import { parseFeed } from '@mikaelporttila/rss';
+import { unescape } from '@std/html';
 import { ensureDir } from '@std/fs';
 import { retry } from '@std/async';
+import * as cheerio from 'cheerio';
 import { join } from '@std/path';
 
 enum ImageMode {
@@ -87,10 +89,11 @@ async function check_feed(config_feed: Feed) {
 
 		let image: null | string = null;
 		if (config_feed.imageMode == ImageMode.tag && entry.description?.value) {
-			const get_img_link = /[(?:&lt;)<]\s*img.*?src\s*=\s*(["'])(.*?)\1.*?\/[(?:&gt;)>]/s;
-			const image_tag = get_img_link.exec(entry.description.value);
-			if (image_tag) {
-				image = image_tag[2];
+			const $ = cheerio.load(unescape(entry.description.value));
+			const image_src = $('img').first().prop('src');
+
+			if (image_src && URL.parse(image_src)) {
+				image = image_src;
 			}
 		}
 
@@ -106,9 +109,7 @@ async function check_feed(config_feed: Feed) {
 							`[${link.title || `Link ${index + 1}`}](${link.href})`
 						)
 				}`,
-				image: {
-					url: image,
-				},
+				image: image ? { url: image } : undefined,
 				author: {
 					name: feed.title.value ?? 'Someones RSS Feed',
 					url: feed.links[0],
