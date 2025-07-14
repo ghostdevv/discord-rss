@@ -1,0 +1,87 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"type": "object",
+	"properties": {
+		"feeds": {
+			"description": "The RSS/Atom feed(s) to check, can be a URL directory or an object for per-feed configuration.",
+			"minItems": 1,
+			"type": "array",
+			"items": {
+				"anyOf": [
+					{
+						"description": "The RSS/Atom feed URL to check",
+						"type": "string",
+						"format": "uri"
+					},
+					{
+						"type": "object",
+						"properties": {
+							"url": {
+								"description": "The RSS/Atom feed URL to check",
+								"type": "string",
+								"format": "uri"
+							},
+							"imageMode": {
+								"description": "The HTML mode will attempt to parse and attach the first image tag found in the RSS feed to the webhook, if available. The none mode will do nothing.",
+								"default": "none",
+								"type": "string",
+								"enum": [
+									"none",
+									"html"
+								]
+							}
+						},
+						"required": [
+							"url",
+							"imageMode"
+						],
+						"additionalProperties": false
+					}
+				]
+			}
+		},
+		"webhooks": {
+			"description": "The webhook(s) to send the feed(s) to",
+			"minItems": 1,
+			"type": "array",
+			"items": {
+				"type": "string",
+				"format": "uri"
+			}
+		},
+		"healthCheck": {
+			"description": "Optional health check endpoint to call every N seconds, so you can monitor the script",
+			"type": "object",
+			"properties": {
+				"endpoint": {
+					"description": "The heartbeat URL to call",
+					"type": "string",
+					"format": "uri"
+				},
+				"interval": {
+					"description": "How often (in seconds) to call the heartbeat URL",
+					"type": "number",
+					"minimum": 1
+				},
+				"method": {
+					"description": "The HTTP method to use (GET/POST/etc)",
+					"type": "string"
+				}
+			},
+			"required": [
+				"endpoint",
+				"interval",
+				"method"
+			],
+			"additionalProperties": false
+		},
+		"$schema": {
+			"type": "string"
+		}
+	},
+	"required": [
+		"feeds",
+		"webhooks"
+	],
+	"additionalProperties": false
+}

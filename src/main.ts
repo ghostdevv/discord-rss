@@ -1,3 +1,4 @@
+import { config, type Feed } from './config.ts';
 import { parseFeed } from '@mikaelporttila/rss';
 import { unescape } from '@std/html';
 import { ensureDir } from '@std/fs';
@@ -5,54 +6,7 @@ import { retry } from '@std/async';
 import * as cheerio from 'cheerio';
 import { join } from '@std/path';
 
-enum ImageMode {
-	none,
-	html,
-}
-
-interface Feed {
-	url: string;
-	imageMode: ImageMode;
-}
-
-interface Config {
-	feeds: Feed[];
-	webhooks: string[];
-	healthCheck?: {
-		endpoint: string;
-		interval: number;
-		method: string;
-	};
-}
-
 const DEV = Deno.args.includes('--dev');
-
-const config: Config = await import('../config.json', { with: { type: 'json' } }).then((mod) => {
-	return {
-		feeds: mod.default.feeds.map((feed) => {
-			return (typeof feed == 'string')
-				? {
-					url: feed,
-					imageMode: ImageMode.none,
-				}
-				: {
-					url: feed.url,
-					imageMode: { 'none': ImageMode.none, 'tag': ImageMode.html }[feed.imageMode] ||
-						ImageMode.none,
-				} as Feed;
-		}),
-		webhooks: mod.default.webhooks,
-		healthCheck: mod.default.healthCheck || null,
-	} as Config;
-});
-
-if (config.feeds.length == 0) {
-	throw new Error('No feeds given in config');
-}
-
-if (config.webhooks.length == 0) {
-	throw new Error('No webhooks given in config');
-}
 
 async function create_db() {
 	const dir = join(import.meta.dirname!, '../.data');
@@ -88,7 +42,7 @@ async function check_feed(config_feed: Feed) {
 		console.log(`New entry (${entry.id}): ${entry.links[0]?.href}`);
 
 		let image: null | string = null;
-		if (config_feed.imageMode == ImageMode.html && entry.description?.value) {
+		if (config_feed.imageMode == 'html' && entry.description?.value) {
 			const $ = cheerio.load(unescape(entry.description.value));
 			const image_src = $('img').first().prop('src');
 
