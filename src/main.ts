@@ -7,7 +7,7 @@ import { join } from '@std/path';
 
 enum ImageMode {
 	none,
-	tag,
+	html,
 }
 
 interface Feed {
@@ -37,7 +37,7 @@ const config: Config = await import('../config.json', { with: { type: 'json' } }
 				}
 				: {
 					url: feed.url,
-					imageMode: { 'none': ImageMode.none, 'tag': ImageMode.tag }[feed.imageMode] ||
+					imageMode: { 'none': ImageMode.none, 'tag': ImageMode.html }[feed.imageMode] ||
 						ImageMode.none,
 				} as Feed;
 		}),
@@ -88,7 +88,7 @@ async function check_feed(config_feed: Feed) {
 		console.log(`New entry (${entry.id}): ${entry.links[0]?.href}`);
 
 		let image: null | string = null;
-		if (config_feed.imageMode == ImageMode.tag && entry.description?.value) {
+		if (config_feed.imageMode == ImageMode.html && entry.description?.value) {
 			const $ = cheerio.load(unescape(entry.description.value));
 			const image_src = $('img').first().prop('src');
 
