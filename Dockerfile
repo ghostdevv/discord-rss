@@ -4,7 +4,6 @@ LABEL       author="Willow (GHOST)"
 LABEL       maintainer="ghostdevbusiness@gmail.com"
 LABEL       org.opencontainers.image.source="https://github.com/ghostdevv/docker-images"
 
-
 WORKDIR     /app
 
 COPY        . .
