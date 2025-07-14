@@ -20,6 +20,7 @@ The contents should look something like this:
 
 ```json
 {
+	"$schema": "https://raw.githubusercontent.com/ghostdevv/discord-rss/refs/heads/main/config.schema.json",
 	"feeds": [],
 	"webhooks": []
 }
