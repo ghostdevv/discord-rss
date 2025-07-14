@@ -1,10 +1,22 @@
 import { parseFeed } from '@mikaelporttila/rss';
+import { unescape } from '@std/html';
 import { ensureDir } from '@std/fs';
 import { retry } from '@std/async';
+import * as cheerio from 'cheerio';
 import { join } from '@std/path';
 
+enum ImageMode {
+	none,
+	html,
+}
+
+interface Feed {
+	url: string;
+	imageMode: ImageMode;
+}
+
 interface Config {
-	feeds: string[];
+	feeds: Feed[];
 	webhooks: string[];
 	healthCheck?: {
 		endpoint: string;
@@ -15,9 +27,24 @@ interface Config {
 
 const DEV = Deno.args.includes('--dev');
 
-const config = await import('../config.json', { with: { type: 'json' } }).then((mod) =>
-	mod.default as Config
-);
+const config: Config = await import('../config.json', { with: { type: 'json' } }).then((mod) => {
+	return {
+		feeds: mod.default.feeds.map((feed) => {
+			return (typeof feed == 'string')
+				? {
+					url: feed,
+					imageMode: ImageMode.none,
+				}
+				: {
+					url: feed.url,
+					imageMode: { 'none': ImageMode.none, 'tag': ImageMode.html }[feed.imageMode] ||
+						ImageMode.none,
+				} as Feed;
+		}),
+		webhooks: mod.default.webhooks,
+		healthCheck: mod.default.healthCheck || null,
+	} as Config;
+});
 
 if (config.feeds.length == 0) {
 	throw new Error('No feeds given in config');
@@ -51,14 +78,24 @@ async function fetch_feed(url: string) {
 	});
 }
 
-async function check_feed(url: string) {
-	const feed = await fetch_feed(url);
+async function check_feed(config_feed: Feed) {
+	const feed = await fetch_feed(config_feed.url);
 
 	for (const entry of feed.entries) {
-		const kv_key = [url, `${entry.id}`];
+		const kv_key = [config_feed.url, `${entry.id}`];
 		if ((await kv.get(kv_key)).value) continue;
 
 		console.log(`New entry (${entry.id}): ${entry.links[0]?.href}`);
+
+		let image: null | string = null;
+		if (config_feed.imageMode == ImageMode.html && entry.description?.value) {
+			const $ = cheerio.load(unescape(entry.description.value));
+			const image_src = $('img').first().prop('src');
+
+			if (image_src && URL.parse(image_src)) {
+				image = image_src;
+			}
+		}
 
 		const webhook_body = {
 			embeds: [{
@@ -72,6 +109,7 @@ async function check_feed(url: string) {
 							`[${link.title || `Link ${index + 1}`}](${link.href})`
 						)
 				}`,
+				image: image ? { url: image } : undefined,
 				author: {
 					name: feed.title.value ?? 'Someones RSS Feed',
 					url: feed.links[0],
@@ -105,13 +143,13 @@ async function check_feed(url: string) {
 	}
 }
 
-for (const url of config.feeds) {
+for (const config_feed of config.feeds) {
 	try {
-		const cfg = await kv.get([url, 'config']);
-		const feed = await fetch_feed(url);
+		const cfg = await kv.get([config_feed.url, 'config']);
+		const feed = await fetch_feed(config_feed.url);
 
 		const ttl = Math.min(feed.ttl ?? 60, 60);
-		const title = feed.title.value || url;
+		const title = feed.title.value || config_feed.url;
 
 		console.log(`Found feed "${title}", checking every ${ttl} minutes`);
 
@@ -119,18 +157,18 @@ for (const url of config.feeds) {
 			console.log(`  ^ Feed has not been used before, updating store...`);
 
 			for (const entry of feed.entries) {
-				await kv.set([url, `${entry.id}`], true);
+				await kv.set([config_feed.url, `${entry.id}`], true);
 			}
 
-			await kv.set([url, 'config'], { init_ts: Date.now() });
+			await kv.set([config_feed.url, 'config'], { init_ts: Date.now() });
 
 			console.log('  Done');
 		}
 
-		await check_feed(url);
-		setInterval(() => check_feed(url), ttl * 60 * 1000);
+		await check_feed(config_feed);
+		setInterval(() => check_feed(config_feed), ttl * 60 * 1000);
 	} catch (error) {
-		console.log(`Failed to init feed "${url}"`, error);
+		console.log(`Failed to init feed "${config_feed.url}"`, error);
 	}
 }
 
