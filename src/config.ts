@@ -40,6 +40,10 @@ const rawConfigSchema = z.object({
 			method: z
 				.string()
 				.describe('The HTTP method to use (GET/POST/etc)'),
+			headers: z
+				.record(z.string(), z.string())
+				.optional()
+				.describe('A map of the headers to send with the heartbeat request'),
 		})
 		.optional()
 		.describe(

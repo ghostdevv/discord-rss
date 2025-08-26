@@ -66,6 +66,16 @@
 				"method": {
 					"description": "The HTTP method to use (GET/POST/etc)",
 					"type": "string"
+				},
+				"headers": {
+					"description": "A map of the headers to send with the heartbeat request",
+					"type": "object",
+					"propertyNames": {
+						"type": "string"
+					},
+					"additionalProperties": {
+						"type": "string"
+					}
 				}
 			},
 			"required": [

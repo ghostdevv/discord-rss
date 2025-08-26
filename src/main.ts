@@ -127,13 +127,13 @@ for (const config_feed of config.feeds) {
 }
 
 if (config.healthCheck) {
-	const { endpoint, interval, method } = config.healthCheck;
+	const { endpoint, interval, method, headers } = config.healthCheck;
 	console.log(`Setup health check, calling every ${interval} seconds`);
 
 	// deno-lint-ignore no-inner-declarations
 	async function check() {
 		try {
-			await retry(() => fetch(endpoint, { method }), {
+			await retry(() => fetch(endpoint, { method, headers }), {
 				maxTimeout: 2500,
 				minTimeout: 1000,
 				maxAttempts: 2,
