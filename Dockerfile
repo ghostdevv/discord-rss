@@ -1,4 +1,4 @@
-FROM        denoland/deno:alpine-2.7.14
+FROM        denoland/deno:alpine-2.7.14 AS build
 
 LABEL       author="Willow (GHOST)"
 LABEL       maintainer="git@willow.sh"
@@ -10,6 +10,14 @@ WORKDIR     /app
 
 COPY        . .
 
-RUN         deno cache src/main.ts
+RUN         deno bundle src/main.ts --output bundle.js --keep-names
 
-CMD         ["deno", "task", "start"]
+FROM        denoland/deno:alpine-2.7.14
+
+WORKDIR     /app
+
+COPY        --from=build /app/bundle.js .
+
+RUN         deno cache bundle.js
+
+CMD         ["deno", "run", "--allow-net", "--allow-read", "--allow-write", "--unstable-kv", "--allow-env", "bundle.js"]

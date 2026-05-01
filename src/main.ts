@@ -1,15 +1,15 @@
 import { config, type Feed } from './config.ts';
 import { parseFeed } from '@mikaelporttila/rss';
+import { join, resolve } from '@std/path';
 import { unescape } from '@std/html';
 import { ensureDir } from '@std/fs';
 import { retry } from '@std/async';
 import * as cheerio from 'cheerio';
-import { join } from '@std/path';
 
 const DEV = Deno.args.includes('--dev');
 
 async function create_db() {
-	const dir = join(import.meta.dirname!, '../.data');
+	const dir = resolve('./.data');
 	await ensureDir(dir);
 
 	const kv = await Deno.openKv(join(dir, './db'));

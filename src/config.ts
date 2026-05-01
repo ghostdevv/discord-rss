@@ -1,4 +1,4 @@
-import { join } from '@std/path';
+import { join, resolve } from '@std/path';
 import { z } from 'zod';
 
 const feedSchema = z.object({
@@ -55,8 +55,8 @@ type RawConfig = z.infer<typeof rawConfigSchema>;
 export type Config = Omit<RawConfig, 'feeds'> & { feeds: Feed[] };
 
 export async function initConfig(): Promise<Config> {
-	const rawConfigData = await import('../config.json', { with: { type: 'json' } });
-	const rawConfig = await rawConfigSchema.parseAsync(rawConfigData.default);
+	const rawConfigData = await Deno.readTextFile(resolve('./config.json'));
+	const rawConfig = await rawConfigSchema.parseAsync(JSON.parse(rawConfigData));
 
 	return {
 		feeds: rawConfig.feeds.map((feed) =>
