@@ -1,5 +1,12 @@
 FROM        denoland/deno:alpine-2.7.14 AS build
 
+WORKDIR     /app
+COPY        . .
+
+RUN         deno bundle src/main.ts --output bundle.js --keep-names
+
+FROM        denoland/deno:alpine-2.7.14
+
 LABEL       author="Willow (GHOST)"
 LABEL       maintainer="git@willow.sh"
 LABEL       org.opencontainers.image.source="https://github.com/ghostdevv/discord-rss"
@@ -7,15 +14,6 @@ LABEL       org.opencontainers.image.description="A simple script that will chec
 LABEL       org.opencontainers.image.licenses="MIT"
 
 WORKDIR     /app
-
-COPY        . .
-
-RUN         deno bundle src/main.ts --output bundle.js --keep-names
-
-FROM        denoland/deno:alpine-2.7.14
-
-WORKDIR     /app
-
 COPY        --from=build /app/bundle.js .
 
 RUN         deno cache bundle.js
