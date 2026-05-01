@@ -51,18 +51,18 @@ async function check_feed(config_feed: Feed) {
 			}
 		}
 
+		const description = `${entry.description?.value || ''}\n\n${
+			entry.links
+				.filter((link) => link.href && URL.parse(link.href)?.protocol.includes('http'))
+				.map((link, index) => `[${link.title || `Link ${index + 1}`}](${link.href})`)
+		}`;
+
 		const webhook_body = {
 			embeds: [{
 				title: entry.title?.value || '¯\\_(ツ)_/¯',
-				description: `${entry.description?.value || ''}\n\n${
-					entry.links
-						.filter((link) =>
-							link.href && URL.parse(link.href)?.protocol.includes('http')
-						)
-						.map((link, index) =>
-							`[${link.title || `Link ${index + 1}`}](${link.href})`
-						)
-				}`,
+				description: description.length >= 1000
+					? `${description.slice(0, 997)}...`
+					: description,
 				image: image ? { url: image } : undefined,
 				author: {
 					name: feed.title.value ?? 'Someones RSS Feed',
