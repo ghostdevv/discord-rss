@@ -1,7 +1,7 @@
 services:
     discord-rss:
         image: ghcr.io/ghostdevv/discord-rss:alpine
-        restart: always
+        restart: unless-stopped
         container_name: discord_rss
         volumes:
             - './config.json:/app/config.json'
