@@ -1,62 +1,59 @@
 import { join, resolve } from '@std/path';
-import { z } from 'zod';
+import * as v from 'valibot';
 
-const feedSchema = z.object({
-	url: z
-		.url()
-		.describe('The RSS/Atom feed URL to check'),
-	imageMode: z
-		.enum(['none', 'html'])
-		.default('none')
-		.describe(
+const feedSchema = v.object({
+	url: v.pipe(v.string(), v.url(), v.description('The RSS/Atom feed URL to check')),
+	imageMode: v.pipe(
+		v.optional(v.picklist(['none', 'html']), 'none'),
+		v.description(
 			'The HTML mode will attempt to parse and attach the first image tag found in the RSS feed to the webhook, if available. The none mode will do nothing.',
 		),
+	),
 });
 
-export type Feed = z.infer<typeof feedSchema>;
+export type Feed = v.InferOutput<typeof feedSchema>;
 
-const rawConfigSchema = z.object({
-	feeds: z
-		.union([z.url().describe('The RSS/Atom feed URL to check'), feedSchema])
-		.array()
-		.min(1)
-		.describe(
+const rawConfigSchema = v.object({
+	feeds: v.pipe(
+		v.array(v.union([v.pipe(v.string(), v.url()), feedSchema])),
+		v.minLength(1),
+		v.description(
 			'The RSS/Atom feed(s) to check, can be a URL directory or an object for per-feed configuration.',
 		),
-	webhooks: z
-		.url()
-		.array()
-		.min(1)
-		.describe('The webhook(s) to send the feed(s) to'),
-	healthCheck: z
-		.object({
-			endpoint: z
-				.url()
-				.describe('The heartbeat URL to call'),
-			interval: z
-				.number()
-				.min(1)
-				.describe('How often (in seconds) to call the heartbeat URL'),
-			method: z
-				.string()
-				.describe('The HTTP method to use (GET/POST/etc)'),
-			headers: z
-				.record(z.string(), z.string())
-				.optional()
-				.describe('A map of the headers to send with the heartbeat request'),
-		})
-		.optional()
-		.describe(
+	),
+	webhooks: v.pipe(
+		v.array(v.pipe(v.string(), v.url())),
+		v.minLength(1),
+		v.description('The webhook(s) to send the feed(s) to'),
+	),
+	healthCheck: v.pipe(
+		v.optional(
+			v.object({
+				endpoint: v.pipe(v.string(), v.url(), v.description('The heartbeat URL to call')),
+				interval: v.pipe(
+					v.number(),
+					v.minValue(1),
+					v.description('How often (in seconds) to call the heartbeat URL'),
+				),
+				method: v.pipe(v.string(), v.description('The HTTP method to use (GET/POST/etc)')),
+				headers: v.pipe(
+					v.optional(v.record(v.string(), v.string())),
+					v.description('A map of the headers to send with the heartbeat request'),
+				),
+			}),
+		),
+		v.description(
 			'Optional health check endpoint to call every N seconds, so you can monitor the script',
 		),
+	),
 });
 
-type RawConfig = z.infer<typeof rawConfigSchema>;
+type RawConfig = v.InferOutput<typeof rawConfigSchema>;
 export type Config = Omit<RawConfig, 'feeds'> & { feeds: Feed[] };
 
 export async function initConfig(): Promise<Config> {
 	const rawConfigData = await Deno.readTextFile(resolve('./config.json'));
-	const rawConfig = await rawConfigSchema.parseAsync(JSON.parse(rawConfigData));
+	const rawConfig = await v.parseAsync(rawConfigSchema, JSON.parse(rawConfigData));
 
 	return {
 		feeds: rawConfig.feeds.map((feed) =>
@@ -70,7 +67,9 @@ export async function initConfig(): Promise<Config> {
 export const config = await initConfig();
 
 if (import.meta.main) {
-	const schema = z.toJSONSchema(rawConfigSchema.extend({ $schema: z.string().optional() }));
+	const { toJsonSchema } = await import('@valibot/to-json-schema');
+
+	const schema = toJsonSchema(rawConfigSchema, { target: 'draft-2020-12' });
 
 	await Deno.writeTextFile(
 		join(import.meta.dirname!, '../config.schema.json'),
