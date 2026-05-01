@@ -1,0 +1,8 @@
+*
+!LICENSE
+!README.md
+!deno.json
+!deno.lock
+!config.json.example
+!config.schema.json
+!src
