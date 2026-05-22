@@ -1,4 +1,4 @@
-FROM        denoland/deno:alpine-2.7.14 AS build
+FROM        denoland/deno:alpine-2.7.14@sha256:f36b916d304948316d9af285dba7949be6e17ed56af8b90b389295bcf4326cba AS build
 
 ARG         GIT_HASH
 ENV         GIT_HASH=${GIT_HASH}
@@ -8,7 +8,7 @@ COPY        . .
 
 RUN         deno bundle src/main.ts --output bundle.js --keep-names
 
-FROM        denoland/deno:alpine-2.7.14
+FROM        denoland/deno:alpine-2.7.14@sha256:f36b916d304948316d9af285dba7949be6e17ed56af8b90b389295bcf4326cba
 
 LABEL       author="Willow (GHOST)"
 LABEL       maintainer="git@willow.sh"
