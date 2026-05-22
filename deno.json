@@ -19,7 +19,6 @@
 		"@std/path": "jsr:@std/path@^1.1.4",
 		"@valibot/to-json-schema": "jsr:@valibot/to-json-schema@^1.7.0",
 		"cheerio": "npm:cheerio@^1.2.0",
-		"valibot": "jsr:@valibot/valibot@^1.4.0",
-		"xml2js": "npm:xml2js@^0.6.2"
+		"valibot": "jsr:@valibot/valibot@^1.4.0"
 	}
 }
