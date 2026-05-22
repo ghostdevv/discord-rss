@@ -1,6 +1,8 @@
 import { join, resolve } from '@std/path';
 import * as v from 'valibot';
 
+export const DEV = Deno.args.includes('--dev');
+
 const feedSchema = v.object({
 	url: v.pipe(v.string(), v.url(), v.description('The RSS/Atom feed URL to check')),
 	imageMode: v.pipe(

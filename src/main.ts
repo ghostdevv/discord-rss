@@ -1,12 +1,11 @@
-import { config, type Feed } from './config.ts';
+import { config, DEV, type Feed } from './config.ts';
 import { parseFeed } from '@mikaelporttila/rss';
 import { join, resolve } from '@std/path';
+import { printVanity } from './vanity.ts';
 import { unescape } from '@std/html';
 import { ensureDir } from '@std/fs';
 import { retry } from '@std/async';
 import * as cheerio from 'cheerio';
-
-const DEV = Deno.args.includes('--dev');
 
 async function create_db() {
 	const dir = resolve('./.data');
@@ -96,6 +95,8 @@ async function check_feed(config_feed: Feed) {
 		}
 	}
 }
+
+printVanity();
 
 for (const config_feed of config.feeds) {
 	try {

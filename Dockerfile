@@ -1,5 +1,8 @@
 FROM        denoland/deno:alpine-2.7.14 AS build
 
+ARG         GIT_HASH
+ENV         GIT_HASH=${GIT_HASH}
+
 WORKDIR     /app
 COPY        . .
 
