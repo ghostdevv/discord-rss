@@ -1,4 +1,10 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"extends": ["github>ghostdevv/renovate"]
+	"extends": ["github>ghostdevv/renovate:personal"],
+	"packageRules": [
+		{
+			"matchFileNames": ["docker-compose.yml"],
+			"extends": ["default:pinDigestsDisabled"]
+		}
+	]
 }
